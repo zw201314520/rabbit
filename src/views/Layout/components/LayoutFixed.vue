@@ -1,7 +1,28 @@
 <script setup>
+// import { getCategoryAPI } from '@/apis/Layout'
+// import { onMounted, ref } from 'vue';//这一步卡住了，应为我没有导入ref模块,真的哭死，
+
+
+//模板要有响应式数据
+// const categoryList = ref([])
+// const getCategory = async () => {
+//     const res = await getCategoryAPI()
+//     console.log(res);
+//     categoryList.value = res.result
+// }
+// onMounted(() => {
+//     getCategory()
+// })
+
+import { useCategoryStore } from '@/stores/category'
 //vueuse
 import { useScroll } from '@vueuse/core'
-const {y} =useScroll(window)
+const { y } = useScroll(window)
+
+//使用pinia中的数据
+const categoryStore = useCategoryStore()
+
+
 </script>
 
 <template>
@@ -15,33 +36,9 @@ const {y} =useScroll(window)
                     
                     <RouterLink to="/">首页</RouterLink>
                 </li>
-                <li>
-                    <RouterLink to="/">居家</RouterLink>
-                </li>
-                <li>
-                    <RouterLink to="/">美食</RouterLink>
-                </li>
-                <li>
-                    <RouterLink to="/">服饰</RouterLink>
-                </li>
-                <li>
-                    <RouterLink to="/">母婴</RouterLink>
-                </li>
-                <li>
-                    <RouterLink to="/">个护</RouterLink>
-                </li>
-                <li>
-                    <RouterLink to="/">严选</RouterLink>
-                </li>
-                <li>
-                    <RouterLink to="/">数码</RouterLink>
-                </li>
-                <li>
-                    <RouterLink to="/">运动</RouterLink>
-                </li>
-                <li>
-                    <RouterLink to="/">杂项</RouterLink>
-                </li>
+                <li class="home" v-for="item in categoryStore.categoryList" :key="item.id">
+                        <RouterLink to="/">{{ item.name }}</RouterLink>
+                    </li>
             </ul>
 
             <div class="right">
