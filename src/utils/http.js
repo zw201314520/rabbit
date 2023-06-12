@@ -1,5 +1,9 @@
+//1. 实例化 - baseURL + timeout
+//2. 拦截器 - 携带token 401拦截等
+
 //axios基础的封装
 import axios from "axios";
+// 创建axios实例
 const httpInstance = axios.create({
     baseURL: 'http://pcapi-xiaotuxian-front-devtest.itheima.net',
     timeout: 5000

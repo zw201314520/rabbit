@@ -1,6 +1,7 @@
-//createRoufter:创建router实例对象
+//createRouter:创建router实例对象
 //createWebHistory:创建history模式的路由
 
+//createRouter, createWebHistory 这两个名字不是自己起的，在vue-router文件里面有，直接用就好
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '@/views/Login/index.vue'
 import Layout from '@/views/Layout/index.vue'
