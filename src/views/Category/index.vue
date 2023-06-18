@@ -1,33 +1,46 @@
 <script setup>
-import {getCategoryAPI} from '@/apis/category'
+import { getCategoryAPI } from '@/apis/category'
 // import { onMounted, onUpdated, ref } from 'vue';
-import { onMounted,onUpdated, ref } from 'vue';
+import { onMounted, onUpdated, ref } from 'vue';
 import { useRoute } from 'vue-router';//在组件内部获取路由参数的方法
-import {getBannerAPI} from '@/apis/home'
+import { getBannerAPI } from '@/apis/home'
+import GoodsItem from '../Home/components/GoodsItem.vue'
+import { onBeforeRouteUpdate } from 'vue-router';
 
 
 //获取数据
-const categoryDate=ref({})
-const route=useRoute()
-const getCategory=async()=>{
-  const res=await getCategoryAPI(route.params.id)
-  categoryDate.value=res.result
+const categoryData = ref({})
+const route = useRoute()
+const getCategory = async (id=route.params.id) => {
+  const res = await getCategoryAPI(id)
+  categoryData.value = res.result
 }
 // onMounted(()=>getCategory())用onMounted有一个小bag，得手动刷新，所以先用onupdate先顶一下，后面会优化
-onUpdated(()=>getCategory())
+// onUpdated(()=>getCategory())
+onMounted(() => getCategory())//用了这个方法就要去Layout组件里的routerview里添加 key
+
+//目标：路由参数变化的时候，可以吧分类数据接口重新发送
+onBeforeRouteUpdate((to) => {
+  console.log('路由变化了')
+  //存在问题：使用最新的路由参数请求最新的分类数据
+  console.log(to)
+  getCategory(to.params.id)
+})
+
+
 
 //获取banner
-const bannerList= ref([])
+const bannerList = ref([])
 
-const getBanner =async()=>{  
-  const res =await getBannerAPI({
-    distributionSite:'2'
+const getBanner = async () => {
+  const res = await getBannerAPI({
+    distributionSite: '2'
   })
   console.log(res);
   bannerList.value = res.result
 
 }
-onMounted(()=>getBanner())
+onMounted(() => getBanner())
 
 
 </script>
@@ -39,17 +52,46 @@ onMounted(()=>getBanner())
       <div class="bread-container">
         <el-breadcrumb separator=">">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item>{{ categoryDate.name }}</el-breadcrumb-item>
+          <el-breadcrumb-item>{{ categoryData.name }}</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
       <!-- 轮播图 -->
       <div class="home-banner">
-    <el-carousel height="500px">
-      <el-carousel-item v-for="item in bannerList" :key="item.id">
-        <img :src="item.imgUrl" alt="">
-      </el-carousel-item>
-    </el-carousel>
-  </div>
+        <el-carousel height="500px">
+          <el-carousel-item v-for="item in bannerList"
+                            :key="item.id">
+            <img :src="item.imgUrl"
+                 alt="">
+          </el-carousel-item>
+        </el-carousel>
+      </div>
+
+      <div class="sub-list">
+        <h3>全部分类</h3>
+        <ul>
+          <li v-for="i in categoryData.children"
+              :key="i.id">
+            <RouterLink to="/">
+
+              <img :src="i.picture" />
+              <p>{{ i.name }}</p>
+            </RouterLink>
+          </li>
+        </ul>
+      </div>
+      <div class="ref-goods"
+           v-for="item in categoryData.children"
+           :key="item.id">
+        <div class="head">
+          <h3>- {{ item.name }}-</h3>
+        </div>
+        <div class="body">
+          <GoodsItem v-for="good       in item.goods"
+                     :goods="good"
+                     :key="good.id" />
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -77,7 +119,6 @@ onMounted(()=>getBanner())
       li {
         width: 168px;
         height: 160px;
-
 
         a {
           text-align: center;
@@ -137,7 +178,6 @@ onMounted(()=>getBanner())
   width: 1240px;
   height: 500px;
   margin: 0 auto;
-  
 
   img {
     width: 100%;
