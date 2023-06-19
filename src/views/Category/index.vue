@@ -1,46 +1,18 @@
 <script setup>
-import { getCategoryAPI } from '@/apis/category'
 // import { onMounted, onUpdated, ref } from 'vue';
-import { onMounted, onUpdated, ref } from 'vue';
-import { useRoute } from 'vue-router';//在组件内部获取路由参数的方法
-import { getBannerAPI } from '@/apis/home'
 import GoodsItem from '../Home/components/GoodsItem.vue'
-import { onBeforeRouteUpdate } from 'vue-router';
+import { useBanner } from './composables/useBanner'
+import { useCategory } from './composables/useCategory'
 
 
-//获取数据
-const categoryData = ref({})
-const route = useRoute()
-const getCategory = async (id=route.params.id) => {
-  const res = await getCategoryAPI(id)
-  categoryData.value = res.result
-}
-// onMounted(()=>getCategory())用onMounted有一个小bag，得手动刷新，所以先用onupdate先顶一下，后面会优化
-// onUpdated(()=>getCategory())
-onMounted(() => getCategory())//用了这个方法就要去Layout组件里的routerview里添加 key
+const { bannerList } = useBanner()
+const { categoryData } = useCategory()
 
-//目标：路由参数变化的时候，可以吧分类数据接口重新发送
-onBeforeRouteUpdate((to) => {
-  console.log('路由变化了')
-  //存在问题：使用最新的路由参数请求最新的分类数据
-  console.log(to)
-  getCategory(to.params.id)
-})
+
 
 
 
 //获取banner
-const bannerList = ref([])
-
-const getBanner = async () => {
-  const res = await getBannerAPI({
-    distributionSite: '2'
-  })
-  console.log(res);
-  bannerList.value = res.result
-
-}
-onMounted(() => getBanner())
 
 
 </script>
